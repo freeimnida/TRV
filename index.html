@@ -1,3 +1,775 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>TRV × PENTAPORT 필드 큐시트</title>
+<meta name="theme-color" content="#14171B">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
+<style>
+/* ==========================================================================
+   TRV × PENTAPORT — Field Cue Sheet
+   Design language: production call-sheet meets festival night-ops.
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Pretendard-fallback';
+  src: local('Apple SD Gothic Neo'), local('Malgun Gothic');
+}
+
+:root{
+  /* --- color tokens --- */
+  --ink:        #14171B;   /* base background — backstage night */
+  --ink-2:      #191D22;   /* header / nav surface */
+  --surface:    #1E2329;   /* card surface */
+  --surface-2:  #262C33;   /* elevated / active pill */
+  --line:       #30363D;   /* hairline borders */
+  --line-soft:  #262B31;
+
+  --paper:      #F3EFE6;   /* primary text — call-sheet paper */
+  --paper-dim:  #C9C4B8;   /* secondary text on dark */
+  --muted:      #8A8F98;   /* tertiary text */
+
+  --tape:       #FF6B2C;   /* primary accent — gaffer tape orange */
+  --tape-dim:   #4A2C1B;
+  --signal:     #2FC6C9;   /* secondary accent — signal cyan */
+  --signal-dim: #163536;
+  --risk:       #FF5A52;   /* risk / warning accent */
+  --risk-dim:   #3A1E1D;
+  --gold:       #FFC53D;   /* crew: 프리 */
+  --violet:     #B98CFF;   /* crew: 호피 */
+
+  --radius-s: 8px;
+  --radius-m: 14px;
+  --radius-l: 20px;
+
+  --font-display: 'Pretendard', 'Pretendard-fallback', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Pretendard', 'Pretendard-fallback', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+*{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+button{ font-family: inherit; }
+a{ color: inherit; text-decoration:none; }
+::selection{ background: var(--tape); color: var(--ink); }
+
+/* subtle grain / vignette on the base layer to avoid flat AI-slop black */
+.grain{
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    radial-gradient(ellipse at 20% -10%, rgba(255,107,44,0.07), transparent 45%),
+    radial-gradient(ellipse at 100% 0%, rgba(47,198,201,0.06), transparent 40%);
+}
+
+#app{
+  position: relative; z-index: 1;
+  max-width: 560px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  padding-bottom: calc(72px + var(--safe-bottom));
+}
+
+/* ---------------------------------- header ---------------------------------- */
+.topbar{
+  position: sticky; top: 0; z-index: 20;
+  padding: calc(14px + var(--safe-top)) 18px 12px;
+  background: linear-gradient(180deg, var(--ink-2) 80%, rgba(25,29,34,0));
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--line-soft);
+}
+.topbar-row{ display:flex; align-items:center; justify-content:space-between; gap: 10px; }
+.brand{ display:flex; align-items:center; gap:8px; }
+.rec-dot{
+  width:8px; height:8px; border-radius:50%; background: var(--tape);
+  box-shadow: 0 0 0 3px var(--tape-dim);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.4; } }
+.brand-text{
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.16em;
+  color: var(--paper-dim);
+  text-transform: uppercase;
+}
+.call-btn{
+  display:flex; align-items:center; gap:6px;
+  background: var(--surface); border:1px solid var(--line);
+  color: var(--paper);
+  padding: 7px 12px; border-radius: 999px;
+  font-size: 12.5px; font-weight:600;
+}
+.call-btn svg{ width:14px; height:14px; stroke: var(--tape); }
+
+.title-row{ margin-top: 10px; }
+.title-row h1{
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 21px;
+  margin: 0 0 2px;
+  letter-spacing: -0.01em;
+}
+.title-row .phase-desc{
+  font-size: 12.5px;
+  color: var(--paper-dim);
+  line-height: 1.45;
+  margin: 0;
+}
+.title-row .cut-tag{
+  color: var(--tape);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+/* crew filter — "내 동선" */
+.crew-filter-row{
+  display:flex; align-items:center; gap:10px;
+  margin-top: 10px;
+}
+.crew-filter-label{
+  font-family: var(--font-mono);
+  font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted);
+  flex: 0 0 auto;
+}
+.crew-filter-chips{
+  display:flex; gap:6px; overflow-x:auto; scrollbar-width:none;
+}
+.crew-filter-chips::-webkit-scrollbar{ display:none; }
+.crew-filter-chip{
+  flex: 0 0 auto;
+  display:flex; align-items:center; gap:5px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--paper-dim);
+  font-size: 12px;
+  font-weight: 600;
+}
+.crew-filter-chip .crew-dot{ width:6px; height:6px; }
+.crew-filter-chip.active{
+  border-color: transparent;
+  color: var(--ink);
+}
+
+/* day pills */
+.day-scroll{
+  display:flex; gap: 8px;
+  margin-top: 14px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.day-scroll::-webkit-scrollbar{ display:none; }
+.day-pill{
+  flex: 0 0 auto;
+  display:flex; flex-direction:column; align-items:flex-start; gap:2px;
+  padding: 8px 14px;
+  border-radius: var(--radius-m);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  cursor: pointer;
+}
+.day-pill .d-date{
+  font-family: var(--font-mono);
+  font-size: 13px; font-weight:700;
+  color: var(--paper-dim);
+}
+.day-pill .d-phase{
+  font-size: 10.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.day-pill.active{
+  background: var(--tape);
+  border-color: var(--tape);
+}
+.day-pill.active .d-date{ color: var(--ink); }
+.day-pill.active .d-phase{ color: rgba(20,23,27,0.72); }
+
+/* ---------------------------------- content ---------------------------------- */
+.view{ padding: 16px 16px 8px; flex:1; }
+.section-label{
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted);
+  margin: 22px 2px 10px;
+  display:flex; align-items:center; gap:8px;
+}
+.section-label:first-child{ margin-top: 4px; }
+.section-label::after{
+  content:''; flex:1; height:1px; background: var(--line-soft);
+}
+
+/* ---------------------------------- cue card ---------------------------------- */
+.cue-list{ display:flex; flex-direction:column; gap:10px; }
+.cue-card{
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+}
+/* perforated tear-edge — signature motif, a physical call-sheet cue card */
+.cue-card::before{
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:6px;
+  background-image: radial-gradient(circle at 6px 0px, var(--ink) 3px, transparent 3.2px);
+  background-size: 12px 6px;
+  background-repeat: repeat-x;
+  opacity: 0.9;
+}
+.cue-head{
+  display:flex; align-items:center; gap:12px;
+  padding: 14px 14px 12px;
+  cursor:pointer;
+}
+.cue-time{
+  font-family: var(--font-mono);
+  font-size: 14px; font-weight:700;
+  color: var(--tape);
+  flex: 0 0 auto;
+  min-width: 46px;
+}
+.cue-main{ flex:1; min-width:0; }
+.cue-title{ font-size: 14.5px; font-weight:700; color: var(--paper); }
+.cue-crew{ margin-top: 3px; display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+.crew-chip{
+  font-size: 12px;
+  display:inline-flex; align-items:center; gap:3px;
+  padding: 1px 6px 1px 4px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--paper-dim);
+}
+.crew-dot{ width:6px; height:6px; border-radius:50%; }
+.chev{
+  width:16px; height:16px; flex:0 0 auto;
+  color: var(--muted);
+  transition: transform .2s ease;
+}
+.cue-card.open .chev{ transform: rotate(180deg); }
+
+.cue-body{
+  display:none;
+  padding: 0 14px 16px 72px;
+  font-size: 13px;
+  color: var(--paper-dim);
+  line-height: 1.55;
+}
+.cue-card.open .cue-body{ display:block; }
+.cue-row{ margin-bottom: 10px; }
+.cue-row:last-child{ margin-bottom: 0; }
+.cue-row .k{
+  font-family: var(--font-mono);
+  font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 3px;
+  display:block;
+}
+.cue-row .v{ color: var(--paper); white-space: pre-line; }
+.cue-row.point .v{ color: var(--signal); }
+.qa-block{
+  background: var(--surface-2);
+  border-radius: var(--radius-s);
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+.qa-q{ color: var(--paper); font-weight:600; margin-bottom:6px; }
+.qa-q .tag, .qa-a .tag{
+  font-family: var(--font-mono); color: var(--tape); margin-right:6px; font-weight:700;
+}
+.qa-a .tag{ color: var(--signal); }
+.qa-a{ color: var(--paper-dim); }
+.risk-chip{
+  display:flex; gap:8px; align-items:flex-start;
+  background: var(--risk-dim);
+  border: 1px solid rgba(255,90,82,0.35);
+  border-radius: var(--radius-s);
+  padding: 9px 11px;
+  color: #FFCFCB;
+}
+.risk-chip svg{ width:15px; height:15px; flex:0 0 auto; margin-top:1px; stroke: var(--risk); }
+
+.empty-note{
+  text-align:center;
+  color: var(--muted);
+  font-size: 12.5px;
+  padding: 30px 10px;
+}
+
+/* ---------------------------------- reference tab ---------------------------------- */
+.boundary-card{
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  margin-bottom: 10px;
+  overflow:hidden;
+}
+.boundary-head{
+  display:flex; align-items:center; gap:12px;
+  padding: 14px;
+  cursor:pointer;
+}
+.boundary-num{
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--tape);
+  flex: 0 0 auto;
+  width: 30px;
+}
+.boundary-title{ flex:1; }
+.boundary-title .owner{
+  font-family: var(--font-mono);
+  font-size: 10.5px; color: var(--muted); letter-spacing:.05em;
+}
+.boundary-title .headline{
+  font-size: 13.5px; font-weight:700; color: var(--paper);
+  margin-top: 2px; line-height:1.4;
+}
+.boundary-body{ display:none; padding: 0 14px 14px; }
+.boundary-card.open .boundary-body{ display:block; }
+
+.cut-item{
+  border-top: 1px solid var(--line-soft);
+  padding: 12px 2px;
+}
+.cut-item:first-child{ border-top: none; padding-top: 4px; }
+.cut-meta{ display:flex; gap:8px; font-size:12px; color: var(--paper-dim); margin-bottom:6px; flex-wrap:wrap;}
+.cut-meta .place{ color: var(--signal); font-weight:600; }
+.cut-meta .who{ color: var(--muted); }
+.cut-meta .who::before{ content:'· '; }
+.cut-situation{ font-size: 13px; color: var(--paper); line-height:1.5; margin-bottom:8px; }
+.cut-point{ font-size:12.5px; color: var(--paper-dim); margin-bottom:8px; }
+.cut-point .k{ color: var(--muted); font-family: var(--font-mono); font-size:10.5px; margin-right:4px; }
+
+.broll-wrap{ margin-top: 8px; }
+.broll-chips{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.broll-chip{
+  font-size:11.5px; color: var(--paper-dim);
+  background: var(--surface-2); border-radius:999px;
+  padding: 4px 10px;
+}
+
+/* packing list */
+.pack-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pack-col-title{
+  font-size: 11.5px; color: var(--muted); font-family: var(--font-mono);
+  margin-bottom: 8px; letter-spacing:.04em;
+}
+.pack-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; }
+.pack-list li{
+  font-size: 12.5px; color: var(--paper-dim);
+  display:flex; align-items:center; gap:7px;
+}
+.pack-list li::before{
+  content:''; width:5px; height:5px; border-radius:1px; background: var(--tape);
+  flex:0 0 auto;
+}
+.pack-list.given li::before{ background: var(--signal); }
+
+/* ---------------------------------- contacts tab ---------------------------------- */
+.pm-card{
+  display:flex; align-items:center; gap:12px;
+  background: var(--surface); border:1px solid var(--line);
+  border-radius: var(--radius-m); padding: 13px 14px; margin-bottom:10px;
+}
+.pm-info{ flex:1; min-width:0; }
+.pm-name{ font-weight:700; font-size:15px; }
+.pm-role{ font-size:11.5px; color: var(--tape); margin: 1px 0 4px; }
+.pm-desc{ font-size:12px; color: var(--muted); line-height:1.4; }
+.pm-call{
+  flex: 0 0 auto;
+  display:flex; align-items:center; justify-content:center;
+  width:42px; height:42px; border-radius:50%;
+  background: var(--tape); color: var(--ink);
+}
+.pm-call svg{ width:18px; height:18px; stroke: var(--ink); }
+
+.crew-legend-card{
+  display:flex; gap:12px;
+  background: var(--surface); border:1px solid var(--line);
+  border-radius: var(--radius-m); padding: 13px 14px; margin-bottom:10px;
+}
+.crew-legend-emoji{ font-size:22px; flex:0 0 auto; }
+.crew-legend-name{ font-weight:700; font-size:13.5px; display:flex; align-items:center; gap:6px;}
+.crew-legend-desc{ font-size:12px; color: var(--paper-dim); margin:4px 0; line-height:1.45; }
+.crew-legend-assign{ font-size:11px; color: var(--muted); font-family: var(--font-mono); }
+
+/* ---------------------------------- bottom nav ---------------------------------- */
+.bottom-nav{
+  position: fixed; left:0; right:0; bottom:0; z-index: 30;
+  max-width: 560px; margin: 0 auto;
+  background: var(--ink-2);
+  border-top: 1px solid var(--line-soft);
+  display:flex;
+  padding-bottom: var(--safe-bottom);
+}
+.nav-btn{
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;
+  padding: 10px 0 8px;
+  background:none; border:none; color: var(--muted);
+}
+.nav-btn svg{ width:20px; height:20px; stroke: currentColor; }
+.nav-btn span{ font-size: 10.5px; font-weight:600; }
+.nav-btn.active{ color: var(--tape); }
+
+@media (min-width: 561px){
+  #app{ border-left:1px solid var(--line-soft); border-right:1px solid var(--line-soft); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .rec-dot{ animation:none; }
+  .chev{ transition:none; }
+}
+
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div id="app">
+  <div class="topbar" id="topbar"></div>
+  <div class="view" id="view"></div>
+  <nav class="bottom-nav" id="nav"></nav>
+</div>
+<script>
+window.__APP_DATA__ = {"timeline": {"7/30": {"weekday": "목", "phase": "셋팅일", "entries": [{"time": "06:00", "title": "디자인팀 출근 & 집결", "crew": "🐣", "situation": "화장실·샤워장만 있는 빈 공원에서 시설 위치 및 동선 확인", "point": "도면 짚는 손과 텅 빈 행사장 전경 클로즈업", "question": "크레인으로 위치를 여러번 수정하시던데, 제일 신경 쓰신 부분이 뭐예요?", "interviewee": "수퍼 님 \n특징 : 여성/단발/눈이 엄청 커요 \n디자인팀(CD) 소속으로 현장 셋팅 PM이세요.\n\n썬 님 \n특징 : 여성/단발\n디자인팀(CD) 소속으로 수퍼님과 함께 셋팅에 참여하실 거예요. \n촬영 협조에 우호적이에요.\n\n\n유주 님 \n특징 : 여자/갈색 긴 머리 \nPM 중 PM! 운영/기획 전반에 참여하고 \n어레인지나 현장 판단의 책임자예요.\n\n위그 님\n특징 : 남자/뿔테안경\nPM 중 한 분으로 운영 담당이에요.\n운영 전반을 마련하고 있어요.\n현장에서 발생하는 일에 가장 빠르게, 먼저 참여해요.\n\n페퍼 님 \n특징 : 여자/까만 긴 머리\nPM 중 기획을 담당하고 있어요.\n주로 마케팅/콘텐츠/이벤트를 담당해요.\n챗인/챗아웃을 담당하고 있어요.", "risk": "도면과 실제 지형 불일치"}, {"time": "06:30", "title": "디자인팀 셋팅 시작", "crew": "🐣", "situation": "샤워바, 드럼통, 시트지, DP 배치 및 가조립", "point": "빈 공간이 구조물로 채워지는 타임랩스", "question": "제품 배치하고 사진을 계속 찍으시던데, 이유가 있어요?", "interviewee": null, "risk": "초기 셋팅 구역 오류"}, {"time": "07:00", "title": "시트지 및 구조물 작업", "crew": "🐣", "situation": "제품을 여러 번 옮기며 고객 시선에 맞게 진열 수정", "point": "고민하는 표정과 다시 배치하는 행동 관찰", "question": "세세하게 디피 하시던데, 기준이 있나요?", "interviewee": null, "risk": "조립 부품 누락 및 강풍 파손"}, {"time": "08:30", "title": "더티님 출근", "crew": "🌊", "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "09:00", "title": "본사 상차 ", "crew": "💥🌊", "situation": "본사에서 청소도구·제품·집기 체크리스트 확인 후 상차", "point": "체크리스트 확인하는 손, 트럭 문 닫히는 장면", "question": "이제 진짜 펜타포트로 출발하네요, 기분이 어떠세요?", "interviewee": null, "risk": "상차 물품 누락"}, {"time": "10:00", "title": "운영진 이동", "crew": "🌊", "situation": "본사 인원 송도 행사장으로 이동 및 현장 준비 상태 체크", "point": "이동 중 차창 밖 풍경과 기대감 섞인 대화", "question": "벌써 두 번째 송도행이잖아요, 이번에는 뭐가 제일 기대되세요?", "interviewee": null, "risk": "교통 정체로 도착 지연"}, {"time": "11:00", "title": "송도 하차", "crew": "🌊🐣", "situation": "본사 상차 트럭 송도 도착, 부서 합동 물품 하역 및 운반", "point": "[대칭 구도] 5일차 철수 상차와 대칭되는 하역 씬", "question": null, "interviewee": null, "risk": "하역 구역 혼잡, 기물 파손"}, {"time": "11:30", "title": "제품 및 집기 셋팅", "crew": "🌊🐣", "situation": "샤워바, 드럼통 등에 실제 제품 진열 및 위치 재조정", "point": "\"왜 다시 바꾸셨나요?\" 수정하는 과정 관찰", "question": "제품/집기를 계속 수정하시던데 어떤 이유예요?", "interviewee": null, "risk": "고객 동선 시야 제한"}, {"time": "12:00", "title": "점심식사", "crew": "🌊🐣", "situation": "셋팅 인원 점심식사 및 오후 셋팅 일정 조율", "point": "식사 중 일정 조율하는 종이 메모와 대화", "question": null, "interviewee": null, "risk": "식사 시간 지연"}, {"time": "12:30", "title": "운영진 현장 회의", "crew": "🌊🐣", "situation": "오전 셋팅 진척도 점검 및 오후 몽골텐트 설치 구역 확인", "point": "모여서 회의하며 고개 끄덕이는 모습", "question": "지금 셋팅은 얼마나 진행 되었나요?", "interviewee": null, "risk": "오후 더위로 인한 지연 예상"}, {"time": "13:00", "title": "셋팅 (몽골텐트/제품/기물)", "crew": "🌊🐣", "situation": "몽골텐트 설치 및 눕존/휴게공간, 향기카트 기물 셋팅", "point": "땀 흘리는 얼굴과 무거운 집기 옮기는 노동의 무게", "question": "힘들 때 힘이 되는 한마디나 행동이 있어요?", "interviewee": null, "risk": "온열 질환, 중량물 부상"}, {"time": "13:30", "title": "눕존 & 휴게공간 보완", "crew": "🌊🐣", "situation": "러셔들이 쉴 휴게공간 및 관객 눕존 가구 배치", "point": "\"이 공간에서 어떻게 쉬면 좋겠어요?\" 인터뷰", "question": "러셔들이 이 공간에서 어떻게 쉬면 좋겠어요?", "interviewee": null, "risk": "일조량 변화로 인한 그늘 부족"}, {"time": "14:00", "title": "운영진 라운딩", "crew": "🌊🐣", "situation": "시설물 동선 안전 점검 및 위험 요소 제거", "point": "고객 동선을 직접 걸어보며 위험 요소 확인", "question": "라운딩 하실 때 제일 중요하게 보는 건 뭐예요?", "interviewee": null, "risk": "바닥 턱, 날카로운 모서리"}, {"time": "14:30", "title": "행사장 현장 검수", "crew": "🌊🐣", "situation": "도면과 실제 셋팅 구역 최종 대조 및 조정", "point": "진열 수정하며 고민하는 PM의 표정", "question": null, "interviewee": null, "risk": "동선 방해 요인 발견"}, {"time": "15:00", "title": "단체 휴식 & 수분 섭취", "crew": "🌊🐣", "situation": "셋팅 작업 중 단체 휴식 및 얼음/물 나눔", "point": "땀을 닦며 서로 음료 건네는 모습", "question": "이제 셋팅 끝났네요, 만족도는 몇 점이에요?", "interviewee": null, "risk": "체력 저하 및 탈수"}, {"time": "18:00", "title": "석식", "crew": null, "situation": "셋팅 인원 저녁 식사 및 하루 작업 회고", "point": "석식 먹으며 내일 오프닝에 대해 나누는 대화", "question": null, "interviewee": null, "risk": "피로 누적"}, {"time": "20:00", "title": "셔틀 버스 운행", "crew": "🐰💥", "situation": "본사/매장 러셔 셔틀버스 탑승", "point": "대장정을 앞두고 셔틀버스에 오르는 러셔들", "question": null, "interviewee": null, "risk": "탑승 인원 체크 혼선"}, {"time": "20:30", "title": "숙소 이동", "crew": "🐰💥", "situation": "셔틀버스로 숙소 이동", "point": "내일에 대한 설렘이 교차하는 표정", "question": null, "interviewee": null, "risk": "이동 버스 지연"}, {"time": "21:00", "title": "송도 숙소 도착", "crew": "🐰💥🌊🐣", "situation": "숙소 도착 및 짐 풀기", "point": "늦은 시간 숙소 로비에 모여 체크인하는 모습", "question": null, "interviewee": null, "risk": "룸 배정 혼선"}, {"time": "21:30", "title": "숙소 체크인 & 휴식", "crew": "🐰💥🌊🐣", "situation": "룸 체크인 및 티셔츠/명찰 준비", "point": "명찰, 행사 팔찌, 무전기를 테이블에 가지런히 놓는 컷", "question": null, "interviewee": null, "risk": "물품 누락 발견"}, {"time": "22:00", "title": "TRV 브리핑", "crew": "🐰💥🌊🐣", "situation": "전체 브리핑: 내일 동선 및 주의사항 전달", "point": null, "question": null, "interviewee": null, "risk": null}]}, "7/31": {"weekday": "금", "phase": "행사 1일차", "entries": [{"time": "08:00", "title": "TRV 챗인", "crew": "🐰💥🌊🐣", "situation": "아침 기상 후 장비 챙겨 집결", "point": null, "question": null, "interviewee": "존짱 \n프레쉬 워시룸 : 아보\n샤워장 : 이지 \n애프터샤워바 : 리버풀 \n향기카트 : 그로토, 데빌\n굿즈 이벤트 : 비비 \n\n존원 \n프레쉬 워시룸 : 윈도우, 프렌치, 벨라, 잰 \n샤워장 : 터틀, 페어, 나이트, 도즈, 브랜치 \n애프터 샤워바 : 비센트, 그린치, 아쿠아, 후아 \n향기카트 : 페이어리, 머쉬룸, 런던, 포피 \n굿즈 이벤트 : 히츠, 썬, 레체\n\n러셔라운지 : 비타민", "risk": null}, {"time": "08:30", "title": "PM 출근", "crew": "🐰🐣", "situation": "PM 행사장 도착, 밤사이 셋팅물 이상 유무 체크", "point": "무전기, 라운지, 창고 셋팅하는 모습", "question": null, "interviewee": null, "risk": "밤이슬로 인한 기물 미끄럼"}, {"time": "09:00", "title": "오픈조 출근 & 셔틀 운행", "crew": "💥🌊", "situation": "오픈조 셔틀버스 도착, 부스별 오픈 준비", "point": "행사장에 도착해 준비 모드로 빠르게 전환하는 모습", "question": null, "interviewee": null, "risk": "게이트 앞 관객 대기열 혼잡"}, {"time": "09:30", "title": "오픈조 챗인 (운영진/존짱/러셔)", "crew": "🐰/🐣💥/🌊", "situation": "조별 무전 체크 및 오늘 고객 응대 목표 최종 브리핑", "point": "존짱이 조원들 챙겨서 파이팅 외치는 순간", "question": null, "interviewee": null, "risk": "무전 주파수 혼선"}, {"time": "10:00", "title": "운영진 이동 & 최종 동선 점검", "crew": "💥🌊", "situation": "오픈 30분 전! 향기카트 배치", "point": "대기열에서 손님 맞을 준비를 마친 긴장된 눈빛", "question": null, "interviewee": null, "risk": "인파 밀집 대비 통제선 미흡"}, {"time": "10:30", "title": "게이트 오픈 & 첫 손님 응대", "crew": "💥🌊", "situation": "게이트 오픈! 향기카트가 첫 관객을 맞고 환호성 터짐", "point": "준비 모드에서 응대 모드로 표정 바뀌는 순간", "question": null, "interviewee": null, "risk": "초반 일시적 대기열 병목 현상"}, {"time": "11:00", "title": "마감조 출근 / 챗인", "crew": "🐰🐣", "situation": "오후 마감조 도착, 오전 응대 상황 전달 및 존짱 인수인계", "point": "첫 손님을 맞이한 직원들의 상기된 얼굴과 교대 준비", "question": null, "interviewee": null, "risk": "오픈조 교대 늦어짐"}, {"time": "11:30", "title": "오전 응대 안정화", "crew": "🐰🐣", "situation": "예상보다 많은 고객으로 동선 변경", "point": "무전으로 각 팀과 소통하며 인원을 재배치하는 PM", "question": null, "interviewee": null, "risk": null}, {"time": "12:00", "title": "오픈조 점심 (운영진/러셔)", "crew": "🐰/💥", "situation": "오픈조 교대 점심식사, 존짱이 조원들 쉬는 시간 조율", "point": "얼음 바스켓에서 시원한 물을 꺼내 서로 건네는 배려", "question": null, "interviewee": null, "risk": "존에 인원 공백 및 교대 지연"}, {"time": "12:30", "title": null, "crew": null, "situation": null, "point": null, "question": null, "interviewee": null, "risk": "의사결정 지연으로 인한 대기"}, {"time": "13:00", "title": "오후 응대", "crew": "💥🌊", "situation": "화장실/샤워장에 관객들 몰리며 활기 절정", "point": "고객과 함께 웃고 춤추며 즐겁게 제품을 소개하는 모습", "question": null, "interviewee": null, "risk": "화장실 만석에 따른 안내 대기"}, {"time": "13:30", "title": "마감조 중식 (운영진/러셔)", "crew": "🐣/🌊", "situation": "마감조 식사 및 라운지에서 서로의 컨디션 체크", "point": "발바닥 통증을 호소하면서도 고객 반응에 웃는 대화", "question": null, "interviewee": null, "risk": "더위로 인한 식욕 및 체력 저하"}, {"time": "14:00", "title": "TRV 휴게", "crew": null, "situation": null, "point": null, "question": null, "interviewee": null, "risk": "차량 통로 관객 간섭"}, {"time": "14:30", "title": null, "crew": null, "situation": null, "point": null, "question": null, "interviewee": null, "risk": "배관 냄새 및 작업 지연"}, {"time": "15:00", "title": "오픈조 휴게", "crew": null, "situation": "오후 피크 전 오픈조 휴식, 라운지 얼음 수급", "point": "선크림을 다시 바르고 서로 어깨를 주물러주는 팀워크", "question": null, "interviewee": null, "risk": "온열 현기증 호소 인원 발생"}, {"time": "15:30", "title": "15:10 급수차", "crew": null, "situation": "오후 수압 저하 대비 급수 보충", "point": "운영본부에서 현장 피드백을 실시간 반영하는 손길", "question": null, "interviewee": null, "risk": "급수 압력 저하 이슈"}, {"time": "16:00", "title": "자발적 타존 지원", "crew": null, "situation": "바쁜 운영존을 발견한 다른 팀 직원이 합류해 돕는 순간", "point": "누가 시키지 않았는데 자연스럽게 손을 보태는 문화", "question": null, "interviewee": null, "risk": "본래 담당 구역 일시 공백"}, {"time": "16:30", "title": "마감조 휴게 & 키라라 공연", "crew": null, "situation": "PM 권유로 무대 앞으로 달려가 키라라 공연 슬램!", "point": "지친 표정이 음악과 춤으로 살아나는 환희의 순간", "question": null, "interviewee": null, "risk": "공연 몰입으로 교대 복귀 지연"}, {"time": "17:00", "title": null, "crew": null, "situation": null, "point": null, "question": null, "interviewee": null, "risk": "차량 진입 지연 및 인파 혼잡"}, {"time": "18:00", "title": "오픈조 석식 (운영진/러셔)", "crew": "🐰/💥", "situation": "오픈조 저녁 식사 및 1일차 소회 나누기", "point": "\"생각보다 진짜 힘든데 재밌다\"는 솔직한 석식 인터뷰", "question": null, "interviewee": null, "risk": "저녁 피크타임 응대 인력 부족"}, {"time": "18:30", "title": "TRV 휴게", "crew": null, "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "19:00", "title": "TRV 회의", "crew": null, "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "19:30", "title": "마감조 석식 (운영진/러셔)", "crew": "🐣/🌊", "situation": "마감조 교대 식사 및 야간 운영 준비", "point": "컵라면과 찬물로 더위를 식히며 웃음 터지는 휴식공간", "question": null, "interviewee": null, "risk": "야간 체력 저하"}, {"time": "20:30", "title": "오픈조 퇴근 & 챗아웃 (운영진/존짱/러셔)", "crew": "🐰/🐣/💥🌊", "situation": "오픈조 퇴근 챗아웃 / 셔틀버스로 숙소 이동", "point": "버스 창문에 기대어 잠든 피로한, 그러나 뿌듯한 얼굴", "question": null, "interviewee": null, "risk": null}, {"time": "21:00", "title": "송도 숙소 도착 & TRV 챗아웃", "crew": null, "situation": "오픈조 숙소 복귀 완료", "point": "\"오늘 첫날 무사히 마쳤다!\" 서로 박수 쳐주는 로비", "question": null, "interviewee": null, "risk": null}, {"time": "21:30", "title": "급수차", "crew": null, "situation": "마감 급수차", "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "22:30", "title": "게이트 마감 & 마감조 챗아웃", "crew": "🐰💥🌊🐣", "situation": "행사장 최종 소등 및 철수", "point": "텅 빈 1일차 행사장의 밤, 소등되는 부스 조명", "question": null, "interviewee": null, "risk": "야간 퇴근 차량 지연"}, {"time": "23:00", "title": "챗아웃 / 퇴근", "crew": "🐰💥🌊🐣", "situation": "마감조 퇴근 차량 탑승", "point": "지쳐서 버스에서 잠든 모습", "question": null, "interviewee": null, "risk": "극심한 육체적 피로"}, {"time": "23:30", "title": "러셔 숙소 촬영", "crew": "💥🌊", "situation": "서로의 통증을 챙겨주고 오늘 힘이 된 동료에게 감사 인사", "point": "\"오늘 00님이 얼음 가져다줘서 버텼다\" 진솔한 인터뷰", "question": null, "interviewee": null, "risk": "심야 소음 및 수면 부족"}, {"time": "00:00", "title": "PM 숙소 복귀", "crew": "🐰🐣", "situation": "첫날 피드백 반영 및 잔업", "point": null, "question": null, "interviewee": null, "risk": "수정 사항 누락"}, {"time": "01:00", "title": "TRV 장비 점검 / 배터리 충전", "crew": "🐰💥🌊🐣", "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}]}, "8/1": {"weekday": "토", "phase": "행사 2일차", "entries": [{"time": "08:00", "title": "TRV 챗인", "crew": "🐰💥🌊🐣", "situation": "아침 기상 후 장비 챙겨 집결", "point": null, "question": null, "interviewee": "존짱 \n프레쉬 워시룸 : 아보\n샤워장 : 이지 \n애프터샤워바 : 리버풀 \n향기카트 : 그로토, 데빌\n굿즈 이벤트 : 비비 \n\n존원 \n프레쉬 워시룸 : 윈도우, 아몬드, 티스티, 퍼드, 레터\n샤워장 : 터틀, 수안, 카인드, 누아르\n애프터 샤워바 : 비센트, 그린치, 아쿠아\n향기카트 : 페이어리, 머쉬룸\n굿즈 이벤트 : 레체\n\n러셔라운지 : 비타민", "risk": null}, {"time": "08:30", "title": "PM 출근", "crew": "🐰🐣", "situation": "PM 행사장 도착, 1일차 운영 피드백 반영한 동선 점검", "point": "바이럴 체크 및 운영존을 돌아다니며 챙기는 모습", "question": null, "interviewee": null, "risk": "야간 우천/이슬로 인한 기물 미끄럼"}, {"time": "09:00", "title": "오픈조 출근", "crew": "💥🌊", "situation": "오픈조 셔틀 하차 및 부스 오픈 준비, 피로한 얼굴과 물집", "point": "어제와 같지만 미세하게 달라진 표정과 몸짓 포착", "question": null, "interviewee": null, "risk": "교통 체증으로 인한 셔틀 지연"}, {"time": "09:30", "title": "오픈조 챗인 (운영진/존짱/러셔)", "crew": "🐰/🐣💥/🌊", "situation": "주말 최다 인파 대비 공지, 존짱이 조원들 세심하게 배려", "point": "물을 주거나 쉬는 시간을 조율하는 따뜻한 모습", "question": null, "interviewee": null, "risk": "피로 누적에 따른 집중력 하락"}, {"time": "10:00", "title": "운영존", "crew": "💥🌊", "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "10:30", "title": "게이트 오픈", "crew": "💥🌊", "situation": "주말 게이트 오픈! 대기 관객 입장 및 향기카트 첫 응대", "point": "대기줄에서 첫 응대로 표정이 바뀌는 전환의 순간", "question": null, "interviewee": null, "risk": "주말 초반 관객 일시 밀집 및 혼잡"}, {"time": "11:00", "title": "마감조 출근/챗인 (존짱/러셔)", "crew": "🐰🐣", "situation": "마감조 출근, 예상보다 많은 고객 대응을 위해 동선 변경", "point": "문제가 아니라 해결 과정을 따라가며 결정자 연결 촬영", "question": null, "interviewee": null, "risk": "진입로 혼잡으로 인한 교대 지연"}, {"time": "12:00", "title": "오픈조 점심 (운영진/러셔)", "crew": "🐰/💥", "situation": "오픈조 교대 식사, 존짱이 쉬는 직원의 빈자리 지원", "point": "얼음을 가져다주고 음료를 건네며 서로 회복시키는 행동", "question": null, "interviewee": null, "risk": "식사 시간 중 매대 안내 인력 공백"}, {"time": "13:30", "title": "마감조 중식 (운영진/러셔)", "crew": "🐣/🌊", "situation": "마감조 식사 및 급수 지원, 테이핑과 파스, 물집 통증 돌봄", "point": "서로의 상태를 확인하고 챙기는 손짓과 대화 놓치지 않기", "question": null, "interviewee": null, "risk": "급수차 진입로 관객 간섭 및 체력 저하"}, {"time": "14:30", "title": "14:30 오수차", "crew": "🐰", "situation": "화장실 및 샤워장 배수 점검 및 오후 오수 배출 작업", "point": "물의 흐름을 따라가는 촬영, 동선을 확인하는 모습", "question": null, "interviewee": null, "risk": "주말 피크타임 배수 용량 초과"}, {"time": "15:00", "title": "오픈조 휴게 / 15:10 급수차", "crew": "🐰/💥", "situation": "오픈조 휴식 및 오후 급수, 바쁜 팀 발견 시 자연스럽게 합류", "point": "누가 요청했는지가 아니라 왜 스스로 움직였는지 관찰", "question": null, "interviewee": null, "risk": "부서 간 정보 차이 및 체력 안배 실패"}, {"time": "15:30", "title": "TRV 휴게", "crew": null, "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "16:30", "title": "마감조 휴게 / 16:30 급수차", "crew": "🐣/🌊", "situation": "마감조 휴게 및 저녁 조차 작업, 미스트/샤워장 서비스 운영", "point": "업무와 놀이의 경계가 흐려지는 순간, 고객과 춤추는 모습", "question": null, "interviewee": null, "risk": "피크타임 화장실/샤워장 혼잡 및 통제"}, {"time": "17:00", "title": " 17:10 오수차", "crew": null, "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "18:00", "title": "오픈조 석식 (운영진/러셔)", "crew": "🐰/💥", "situation": "오픈조 저녁 식사 및 야간 전환 준비, 라운지 휴식", "point": "식사 중 서로 격려하며 오늘 힘이 된 사람에 대해 나누는 대화", "question": null, "interviewee": null, "risk": "야간 조명 전환 시간대 인력 공백"}, {"time": "18:30", "title": "TRV 휴게", "crew": null, "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "19:00", "title": "TRV 회의", "crew": null, "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "19:30", "title": "마감조 석식 (운영진/러셔)", "crew": "🐣/🌊", "situation": "마감조 식사 ", "point": "타 운영존 직원들에게 제품 소개나 물 건네며 관계 만들기", "question": null, "interviewee": null, "risk": "야간 시야 제한 및 기온 저하"}, {"time": "20:00", "title": "20:00 급수차", "crew": "🐣", "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "20:30", "title": "오픈조 퇴근 & 챗아웃 (운영진/존짱/러셔)", "crew": "🐰/🐣/💥🌊", "situation": "오픈조 퇴근 챗아웃, 셔틀버스로 숙소 이동", "point": "지쳐 있지만 익숙하게 움직이는 사람들, 버스 안 휴식 얼굴", "question": null, "interviewee": null, "risk": "퇴근 인원 파악 혼선"}, {"time": "21:30", "title": "21:30 급수차", "crew": null, "situation": "야간 마감 급수차 작업 및 행사 끝자락 고객 안내", "point": "고객 안전을 위해 조차 동선을 안내하는 러셔들의 눈빛", "question": null, "interviewee": null, "risk": "야간 통행 관객과 차량 동선 간섭"}, {"time": "22:30", "title": "게이트 마감", "crew": "🐰💥🌊🐣", "situation": "게이트 마감 및 시설 야간 통제 전환", "point": "관객이 빠져나가는 현장, 조명이 꺼지고 철수 모드 전환", "question": null, "interviewee": null, "risk": "마감 후 장기 체류 관객 안내 지연"}, {"time": "23:00", "title": "챗아웃/퇴근", "crew": "🐰💥🌊🐣", "situation": "일과 종료 챗아웃 및 퇴근 차량 탑승, 하루 마감 회고", "point": "하루 마감 전 피드백을 나누며 개선점을 정리하는 모습", "question": null, "interviewee": null, "risk": "극심한 피로 누적 및 차량 이동 지연"}, {"time": "23:30", "title": "러셔 숙소 촬영", "crew": "💥🌊", "situation": "숙소 복귀 후 서로의 상태를 확인하고 테이핑과 파스 나눔", "point": "서로 돌보는 손짓과 \"오늘 몸 상태 괜찮으세요?\" 따뜻한 대화", "question": null, "interviewee": null, "risk": "수면 시간 단축으로 인한 피로"}, {"time": "00:00", "title": "PM 숙소 복귀", "crew": "🐰🐣", "situation": "PM 숙소 복귀 및 다음 날 공지사항/타임테이블 정리", "point": "노트북이나 메모에 적히는 개선안, 피로한 얼굴의 회의", "question": null, "interviewee": null, "risk": "일정 변경 사항 공유 지연"}, {"time": "01:00", "title": "TRV 장비 점검 / 배터리 충전", "crew": "🐰💥🌊🐣", "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}]}, "8/2": {"weekday": "일", "phase": "행사 3일차", "entries": [{"time": "08:00", "title": "TRV 챗인", "crew": "🐰💥🌊🐣", "situation": "아침 기상 후 장비 챙겨 집결", "point": null, "question": null, "interviewee": "존짱 \n프레쉬 워시룸 : 아보\n샤워장 : 이지 \n애프터샤워바 : 리버풀 \n향기카트 : 그로토, 데빌\n굿즈 이벤트 : 비비 \n\n존원 \n프레쉬 워시룸 : 스노우, 퍼드, 브랜치\n샤워장 : 페어, 수안, 팅글, 누아르, 잰\n애프터 샤워바 : 비센트, 터메릭, 티미\n향기카트 : 페이어리, 런던, 포피\n굿즈 이벤트 : 히츠, 썬\n\n러셔라운지 : 비타민", "risk": null}, {"time": "08:30", "title": "PM 출근", "crew": "🐰🐣", "situation": "PM 행사장 도착, 1일차 운영 피드백 반영한 동선 점검", "point": "바이럴 체크 및 운영존을 돌아다니며 챙기는 모습", "question": null, "interviewee": null, "risk": "야간 우천/이슬로 인한 기물 미끄럼"}, {"time": "09:00", "title": "오픈조 출근", "crew": "💥🌊", "situation": "오픈조 셔틀 하차 및 부스 오픈 준비, 피로한 얼굴과 물집", "point": "어제와 같지만 미세하게 달라진 표정과 몸짓 포착", "question": null, "interviewee": null, "risk": "교통 체증으로 인한 셔틀 지연"}, {"time": "09:30", "title": "오픈조 챗인 (운영진/존짱/러셔)", "crew": "🐰/🐣💥/🌊", "situation": "주말 최다 인파 대비 공지, 존짱이 조원들 세심하게 배려", "point": "물을 주거나 쉬는 시간을 조율하는 따뜻한 모습", "question": null, "interviewee": null, "risk": "피로 누적에 따른 집중력 하락"}, {"time": "10:00", "title": "운영존", "crew": "💥🌊", "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "10:30", "title": "게이트 오픈", "crew": "💥🌊", "situation": "주말 게이트 오픈! 대기 관객 입장 및 향기카트 첫 응대", "point": "대기줄에서 첫 응대로 표정이 바뀌는 전환의 순간", "question": null, "interviewee": null, "risk": "주말 초반 관객 일시 밀집 및 혼잡"}, {"time": "11:00", "title": "마감조 출근/챗인 (존짱/러셔)", "crew": "🐰🐣", "situation": "마감조 출근, 예상보다 많은 고객 대응을 위해 동선 변경", "point": "문제가 아니라 해결 과정을 따라가며 결정자 연결 촬영", "question": null, "interviewee": null, "risk": "진입로 혼잡으로 인한 교대 지연"}, {"time": "12:00", "title": "오픈조 점심 (운영진/러셔)", "crew": "🐰/💥", "situation": "오픈조 교대 식사, 존짱이 쉬는 직원의 빈자리 지원", "point": "얼음을 가져다주고 음료를 건네며 서로 회복시키는 행동", "question": null, "interviewee": null, "risk": "식사 시간 중 매대 안내 인력 공백"}, {"time": "13:30", "title": "마감조 점심 / 13:40 급수차", "crew": "🐣/🌊", "situation": "마감조 식사 및 급수 지원, 테이핑과 파스, 물집 통증 돌봄", "point": "서로의 상태를 확인하고 챙기는 손짓과 대화 놓치지 않기", "question": null, "interviewee": null, "risk": "급수차 진입로 관객 간섭 및 체력 저하"}, {"time": "14:30", "title": "14:30 오수차", "crew": "🐰", "situation": "화장실 및 샤워장 배수 점검 및 오후 오수 배출 작업", "point": "물의 흐름을 따라가는 촬영, 동선을 확인하는 모습", "question": null, "interviewee": null, "risk": "주말 피크타임 배수 용량 초과"}, {"time": "15:00", "title": "TRV 휴게", "crew": null, "situation": null, "point": null, "question": null, "interviewee": null, "risk": "부서 간 정보 차이 및 체력 안배 실패"}, {"time": "16:00", "title": "드랙퀸 초대", "crew": null, "situation": "직원과 관객이 춤추며 노는 모습", "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "16:30", "title": "마감조 휴게 (운영진/러셔)", "crew": "🐣/🌊", "situation": "마감조 휴게 및 저녁 조차 작업, 미스트/샤워장 서비스 운영", "point": "업무와 놀이의 경계가 흐려지는 순간, 고객과 춤추는 모습", "question": null, "interviewee": null, "risk": "피크타임 화장실/샤워장 혼잡 및 통제"}, {"time": "17:00", "title": " 17:10 오수차", "crew": null, "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "18:00", "title": "오픈조 석식 (운영진/러셔)", "crew": "🐰/💥", "situation": "오픈조 저녁 식사 및 야간 전환 준비, 라운지 휴식", "point": "식사 중 서로 격려하며 오늘 힘이 된 사람에 대해 나누는 대화", "question": null, "interviewee": null, "risk": "야간 조명 전환 시간대 인력 공백"}, {"time": "18:30", "title": "TRV 휴게", "crew": null, "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "19:00", "title": "TRV 회의", "crew": null, "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "19:30", "title": "마감조 석식", "crew": "🐣/🌊", "situation": "마감조 식사 ", "point": "타 운영존 직원들에게 제품 소개나 물 건네며 관계 만들기", "question": null, "interviewee": null, "risk": "야간 시야 제한 및 기온 저하"}, {"time": "20:00", "title": "20:00 급수차", "crew": null, "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "20:30", "title": "오픈조 퇴근 & 챗아웃 (운영진/존짱/러셔)", "crew": "🐰/🐣/💥🌊", "situation": "오픈조 퇴근 챗아웃, 셔틀버스로 숙소 이동", "point": "지쳐 있지만 익숙하게 움직이는 사람들, 버스 안 휴식 얼굴", "question": null, "interviewee": null, "risk": "퇴근 인원 파악 혼선"}, {"time": "21:00", "title": null, "crew": null, "situation": "🐰💥 셔틀 버스 탑승", "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "21:30", "title": "21:30 급수차", "crew": "🌊🐣", "situation": "야간 마감 급수차 작업 및 행사 끝자락 고객 안내", "point": "고객 안전을 위해 조차 동선을 안내하는 러셔들의 눈빛", "question": null, "interviewee": null, "risk": "야간 통행 관객과 차량 동선 간섭"}, {"time": "22:00", "title": null, "crew": null, "situation": "🐰💥 드라이브에 촬영본 백업 후 퇴근 (사무실에 아이폰 반납)", "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "22:30", "title": "게이트 마감", "crew": "🌊🐣", "situation": "게이트 마감 및 시설 야간 통제 전환", "point": "관객이 빠져나가는 현장, 조명이 꺼지고 철수 모드 전환", "question": null, "interviewee": null, "risk": "마감 후 장기 체류 관객 안내 지연"}, {"time": "23:00", "title": "챗아웃/퇴근", "crew": "🌊", "situation": "일과 종료 챗아웃 및 퇴근 차량 탑승, 하루 마감 회고", "point": "하루 마감 전 피드백을 나누며 개선점을 정리하는 모습", "question": null, "interviewee": null, "risk": "극심한 피로 누적 및 차량 이동 지연"}, {"time": "23:30", "title": "러셔 숙소 촬영", "crew": "🌊", "situation": "숙소 복귀 후 서로의 상태를 확인하고 테이핑과 파스 나눔", "point": "서로 돌보는 손짓과 \"오늘 몸 상태 괜찮으세요?\" 따뜻한 대화", "question": null, "interviewee": null, "risk": "수면 시간 단축으로 인한 피로"}, {"time": "00:00", "title": "PM 숙소 복귀", "crew": "🐣", "situation": "PM 숙소 복귀 및 다음 날 공지사항/타임테이블 정리", "point": "노트북이나 메모에 적히는 개선안, 피로한 얼굴의 회의", "question": null, "interviewee": null, "risk": "일정 변경 사항 공유 지연"}, {"time": "01:00", "title": "TRV 장비 점검 / 배터리 충전", "crew": "🌊🐣", "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}]}, "8/3": {"weekday": "월", "phase": "철수일", "entries": [{"time": "06:00", "title": "디자인팀 철수", "crew": "🌊🐣", "situation": "이른 아침 집기 / 구조물 철수", "point": "1일차 셋팅과 대칭되는 구도! 구조물을 뜯고 정리하는 손놀림", "question": null, "interviewee": "수퍼 님 \n특징 : 여성/단발/눈이 엄청 커요 \n디자인팀(CD) 소속으로 현장 철수 PM이세요.\n\n썬 님 \n특징 : 여성/단발\n디자인팀(CD) 소속으로 수퍼님과 함께 철수에 참여하실 거예요. \n촬영 협조에 우호적이에요.\n\n유주 님\n특징 : 여자/갈색 긴 머리 \nPM 중 PM! 운영/기획 전반에 참여하고 \n어레인지나 현장 판단의 책임자예요.\n\n위그 님\n특징 : 남자/뿔테안경\nPM 중 한 분으로 운영 담당이에요.\n운영 전반을 마련하고 있어요.\n현장에서 발생하는 일에 가장 빠르게, 먼저 참여해요.\n\n페퍼 님 \n특징 : 여자/까만 긴 머리\nPM 중 기획을 담당하고 있어요.\n주로 마케팅/콘텐츠/이벤트를 담당해요.\n챗인/챗아웃을 담당하고 있어요.", "risk": "시트지 제거 시 스크래치 및 기물 파손"}, {"time": "08:00", "title": "화장실 철수", "crew": "🌊🐣", "situation": "크레인/중장비 진입하여 이동식 화장실 및 샤워장 철거 작업", "point": "크레인과 중장비가 화장실/샤워장을 들어 올리는 장면", "question": null, "interviewee": null, "risk": null}, {"time": "08:30", "title": "셔틀 운행", "crew": "🌊🐣", "situation": "본사 및 매장 철수 지원 인원 행사장 이동 셔틀 운행", "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "09:00", "title": "운영진 이동", "crew": "🌊🐣", "situation": "PM 및 운영진 현장 이동, 전 구역 철거 진행률 및 상차 동선 지휘", "point": "빈 행사장을 바라보는 PM", "question": null, "interviewee": null, "risk": null}, {"time": "11:00", "title": "본사 하차", "crew": "🌊🐣", "situation": "본사 트럭 도착 및 제품 하차/상차, 1일차와 대칭되는 물류 작업", "point": "본사 트럭 도착 및 제품 하차/상차, 1일차와 대칭되는 물류 작업", "question": null, "interviewee": null, "risk": null}, {"time": "11:30", "title": "촬영 종료", "crew": "🌊🐣", "situation": "수많은 준비 끝에 완주한 현장, 다큐멘터리 공식 촬영 종료", "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "12:00", "title": "장비 반납", "crew": "🐣", "situation": null, "point": null, "question": null, "interviewee": null, "risk": null}, {"time": "13:00", "title": "셔틀 운행", "crew": null, "situation": "철수조 버스로 이동", "point": null, "question": null, "interviewee": null, "risk": null}]}}, "boundaries": [{"header": "담당자 : 프리 ➊ 고객이 불편하지 않도록 보이지 않는 기반을 만드는 사람들", "cuts": [{"place": "본사", "person": "브랜치, 본사 인원", "situation": "오전 상차. 청소도구·제품·집기·운영물품을 체크리스트로 확인하고, 여러 부서가 함께 물건을 나른 뒤 트럭이 출발한다.", "point": "물건보다 사람을 따라간다. 체크리스트를 확인하는 손, 짐을 옮기는 모습, 트럭 문이 닫히고 차량이 송도로 출발하는 장면을 담는다.", "question": "지금 체크리스트에서 가장 마지막까지 꼼꼼하게 확인하신 물품은 무엇인가요?", "answer": "샤워장이랑 화장실에서 쓸 위생 용품들이요. 현장에서 혹시라도 부족하면 안 되니까 수량 한 번 더 더블체크했습니다."}, {"place": "본사", "person": "PM", "situation": "행사장으로 출발하는 셋팅 담당자들. 셋팅을 위해 이른 아침 집결한다.", "point": "출발 전 긴장과 설렘, 차량에 짐을 싣고 마지막으로 확인하는 모습을 담는다.", "question": "차량 출발 직전에 확인하신 건 뭐예요?", "answer": "~요. 현장 도착하자마자 바로 움직여야 해서 빠진 건 없는지 체크하고 있습니다."}, {"place": "행사장", "person": "PM, CD", "situation": "화장실·샤워장·드럼통·팔레트만 있는 공원에서 시설물 위치를 확인한다. 도면과 실제 현장을 비교하고, 제품과 집기를 설치한다.", "point": "빈 공간이 채워지는 과정을 타임랩스로 담는다. 배치도/도면을 손가락으로 짚는 손, 실제 위치와 비교하는 시선을 클로즈업한다.", "question": "지금 어떤 작업 중이세요?", "answer": "우리가 진짜 펜타포트의 보이지 않는 주인공이었다! 다들 너무 자랑스럽고 고맙다'는 말을 꼭 안아주면서 해주고 싶습니다."}, {"place": "샤워장", "person": "위그", "situation": "급배수 구조를 확인하고 급수차 진입 동선을 점검한다. 공연 시간과 급배수 시간을 맞추고, 고객 통로와 차량 통로가 겹치지 않도록 조정한다.", "point": "물의 흐름을 따라가는 촬영. 동선을 직접 걸어보는 발걸음, 시계와 동선, 현장을 번갈아 확인하는 모습을 담는다.", "question": "급수차 동선을 직접 확인하셨는데, 이유가 있나요?", "answer": null}, {"place": "행사장", "person": "PM", "situation": "셋팅 후 마지막으로 시설과 동선을 점검한다.", "point": "긴장감이 아니라 '혹시 빠진 것이 없는지' 확인하는 모습을 담는다.", "question": "셋팅이 거의 다 마무리 되었는데 만족스러우세요?", "answer": null}, {"place": "드럼통 / 샤워바", "person": "PM, CD", "situation": "제품을 여러 번 옮기며 진열을 수정한다. 고객 동선을 직접 걸어보며 위치를 바꾼다.", "point": "결과보다 수정하는 과정을 담는다. 고민하는 표정과 다시 배치하는 행동을 관찰한다.", "question": "방금 제품 위치를 다시 조정하셨는데, 이유가 있어요?", "answer": null}, {"place": "행사장", "person": "PM", "situation": "셋팅 종료 후 사람은 빠지고 시설물만 남은 현장. 빈 공간이 하나의 운영 가능한 공간으로 바뀐 순간을 보여준다.", "point": "인적 없는 시설물을 담아 완성을 담는다.", "question": null, "answer": null}, {"place": "셔틀 버스", "person": "러셔", "situation": "늦은 오후 행사장으로 이동하는 본사/매장의 러셔들.", "point": "사람들의 긴장한, 설레이는 얼굴을 담는다.", "question": "현장에 도착하자마자 해보고 싶은 일이나 기대되는 순간 있으세요?", "answer": null}]}, {"header": "담당자 : 호피/프리  ➋ 계획과 실제 현장의 차이를 조율하는 과정", "cuts": [{"place": "행사장", "person": "PM", "situation": "무거운 시설물의 위치를 갑자기 다시 바꾸고, 급배수·시설물의 동선이 꼬여 현장에서 재조정한다. 더위와 시간 압박 속에서도 전원이 역할을 나눠 완성한다.", "point": "문제 발생 순간부터 재조정까지 끊지 않고 이어서 담는다.", "question": "방금 시설물 위치를 바꾸셨는데, 어떤 이유 때문일까요?", "answer": null}, {"place": "게이트, 각 운영존", "person": "존짱", "situation": "게이트가 오픈되고 이른 시간부터 기다린 관객이 들어온다. 향기카트가 첫 관객을 맞고, 준비 모드에서 응대 모드로 표정이 바뀐다.", "point": "대기줄에서 첫 응대로 이어지는 전환의 순간을 놓치지 않고 담는다.", "question": "첫 손님이 입장했을 때 어떻게 첫인사를 건네셨어요?", "answer": null}, {"place": "운영본부", "person": "PM", "situation": "예상보다 고객이 많아 동선을 변경한다. 무전으로 각 팀과 계속 소통하며 인원을 재배치한다.", "point": "문제가 아니라 해결 과정을 따라간다. 누가 결정하고 누가 움직이는지 연결해서 촬영한다.", "question": "무전으로 인원 재배치 하시는 것 같던데, 이유가 있으셨어요?", "answer": null}, {"place": "운영본부, 숙소", "person": "PM", "situation": "운영 종료 후 피드백 미팅을 하고, 숙소에서 무전기를 충전하며 다음 날 공지를 정리한다.", "point": "피로한 얼굴로 회의하는 모습, 메모하는 손을 담는다.", "question": "오늘 하루를 마치면서, 내일 바로 적용하기로한 개선 사항이 있다면 뭐예요?", "answer": null}, {"place": "운영본부", "person": "PM", "situation": "예상보다 고객이 많아/적어 동선을 변경한다. 무전으로 각 팀과 계속 소통한다.", "point": "문제가 아니라 해결 과정을 따라간다. 누가 결정하고 누가 움직이는지 연결해서 촬영한다.", "question": "실시간으로 무전하시던데, 존짱들에게 가장 강조해서 전달하신 건 뭐예요?", "answer": null}, {"place": "행사장 전역", "person": "존짱 / PM", "situation": "교대자 미도착, 존짱별 운영 퀄리티 차이, 본사·매장 정보 차이, 결정권자 지연으로 인한 재작업 등 예상 가능한 갈등이 발생한다.", "point": "문제 발견 → 공유 → 서로 다른 해석 → 판단 → 재배치 → 재운영 → 개선을 순서대로 촬영한다.", "question": "예상 못한 일이 생긴 것 같던데, 팀원들이랑 어떤식으로 대처하는 편이세요?", "answer": null}, {"place": "운영본부", "person": "PM", "situation": "하루 마감 전 피드백을 나누며 개선점을 정리한다.", "point": "노트북이나 메모에 적히는 개선안을 클로즈업한다.", "question": "피드백 미팅 끝났는데, 오늘 운영에서 가장 만족스러웠던 순간은 뭐였어요?", "answer": null}]}, {"header": "담당자 : 더티/블래스트 ➌ 공식적인 업무와 자발적인 헌신이 섞이는 순간", "cuts": [{"place": "숙소", "person": "러셔", "situation": "기상 후 티셔츠와 장비를 챙기고 무전기 수령·충전 상태를 확인한다. 차량으로 이동하며 긴장과 기대가 섞인 대화를 나눈다.", "point": "준비하는 손과 표정, 이동 중 차창 밖 풍경을 함께 담는다.", "question": "오늘 아침 무전기랑 장비 챙겨서 나오면서 동료들이랑 나눈 첫 대화는 뭐였어요?", "answer": null}, {"place": "운영존", "person": "존짱", "situation": "존짱이 조원들을 세심하게 챙기고 배려한다.", "point": "물을 주거나 쉬는 시간을 조율하는 모습을 담는다.", "question": "휴식 시간 조율하고 물 챙겨주시던데, 어떻게 그렇게 세심하게 챙기세요?", "answer": null}, {"place": "운영존", "person": "PM", "situation": "쉬는 시간을 업무에 활용한다.", "point": "바이럴 체크 / 운영존을 돌아다니며 챙기는 모습을 담는다.", "question": "쉬는 시간에도 현장 둘러보시네요, 주로 어떤 걸 확인하세요?", "answer": null}, {"place": "운영존 뒤", "person": "러셔", "situation": "자기 일이 끝났지만 다른 팀을 먼저 도와준다.", "point": "부탁받는 장면보다 스스로 움직이는 순간을 담는다.", "question": "본인 업무가 아닌데도 다른 존으로 발걸음을 옮긴 이유가 있으세요?", "answer": null}, {"place": "행사장", "person": "러셔", "situation": "바쁜 팀을 발견하고 자연스럽게 합류한다.", "point": "누가 요청했는지가 아니라 왜 움직였는지를 관찰한다.", "question": "바빠 보여서 도와주신 거예요? 힘들 텐데, 도와주려고 하신 이유가 있어요?", "answer": null}, {"place": "러셔 라운지", "person": "러셔", "situation": "러셔 라운지에 있는 쓰레기/음식물을 자발적으로 치우는 사람.", "point": "누가 시키지 않았음에도 자발적으로 돕는 모습을 담는다.", "question": "부탁 받으신 거예요? 아까 보니까 다 치워주시던데.", "answer": null}]}, {"header": "담당자 : 더티/블래스트 ➍ 힘든 노동 속에서도 즐길 수 있는 환경을 서로에게 만들어주는 모습", "cuts": [{"place": "눕존·휴게공간", "person": "피플케어", "situation": "눕존과 휴식 공간을 셋팅한다.", "point": "땀 흘리는 얼굴과 준비물을 함께 담아 셋팅하는 사람의 더위와 노동을 동시에 보여준다.", "question": "러셔들이 여기 누웠을 때 어떤 기분을 느끼길 바라면서 준비하셨어요?", "answer": null}, {"place": "숙소, 휴게공간", "person": "오픈조", "situation": "오픈조의 피로한 얼굴, 손의 물집, 허리와 발의 통증이 드러난다.", "point": "어제와 같은 동선이지만 미세하게 달라진 표정과 몸짓을 포착한다.", "question": "오늘의 각오가 있나요?", "answer": null}, {"place": "숙소, 휴게공간", "person": "러셔", "situation": "테이핑과 파스, 선크림, 물집과 통증, 서로의 상태를 확인하는 모습.", "point": "서로를 챙기는 손짓과 대화를 놓치지 않는다.", "question": "아까 서로 파스 붙여주고, 얼음물도 건네주던데 서로 응원도 해줬어요?", "answer": null}, {"place": "향기카트, 샤워장", "person": "존짱 / 러셔", "situation": "미스트 장비와 샤워장 서비스, 고객과 춤추는 직원, 즉흥적으로 노는 모습, 고객 응대가 이어진다.", "point": "업무와 놀이의 경계가 흐려지는 순간을 담는다.", "question": "엄청 신나게 즐기시던데, 고객이랑 친해진 비결이 있어요?", "answer": null}, {"place": "휴게공간", "person": "러셔", "situation": "얼음을 가져다주고, 음료를 건네고, 농담을 하며 분위기를 바꾼다.", "point": "쉬는 장면이 아니라 서로를 회복시키는 행동을 담는다.", "question": "라운지에 들어오는 동료들을 위해서 시원한 음료랑 얼음 준비해 주셨는데, 러셔들의 어떤 표정을 볼 때 가장 뿌듯하세요?", "answer": null}, {"place": "무대 앞", "person": "존짱 / 러셔", "situation": "PM/존짱이 공연을 보고 오라고 권하고, 직원이 공연장으로 달려가 슬램하거나 함께 춤춘 뒤 다시 업무로 복귀한다.", "point": "지친 표정에서 살아난 표정으로 바뀌는 전환을 포착한다.", "question": "방금 무대 앞에 달려가서 신나게 즐기고 오셨는데, 어떠셨어요?", "answer": null}, {"place": "운영존", "person": "러셔", "situation": "타 운영존의 직원들에게 제품을 소개하거나 물을 건넨다.", "point": "고객뿐 아니라 함께 일하는 사람들과 관계를 만드는 모습을 담는다.", "question": "다른 운영존에 제품 소개도 해주시고, 물도 주시던데 원래 아는 분이에요?", "answer": null}, {"place": "숙소", "person": "러셔", "situation": "지쳐 있지만 익숙하게 움직이는 사람들. 마지막 브리핑, \"오늘만 하면 끝\"이라는 말, 들뜸과 피로가 공존한다.", "point": "표정에서 안도와 아쉬움을 동시에 포착한다.", "question": "이번 행사에서 잊지 못할 장면이 있다면 뭐예요?", "answer": null}, {"place": "편의점", "person": "러셔", "situation": "끝나고 편의점 앞에 모여서 시간을 보내는 모습.", "point": null, "question": null, "answer": null}]}, {"header": "담당자 : 프리/더티 ➎ 모든 것이 사라진 빈 현장에서 느끼는 완주의 감정", "cuts": [{"place": "각 운영존", "person": "존짱", "situation": "마지막 샤워 고객, 마지막 화장실 청소, 마지막 향기카트 운행, 정리 전 마지막 응대, 직원과 고객의 짧은 작별.", "point": "처음이 아니라 '마지막'이라는 감각으로 같은 장면을 다시 찍는다.", "question": "펜타에서 만난 마지막 관객에게 건넨 인사는 뭐였어요?", "answer": "내년에 우리 건강하고 행복한 모습으로 여기서 다시 만나요!'라고 인사했어요. 손님도 활짝 웃으면서 손 흔들어 주셨는데 참 뭉클했습니다."}, {"place": "무대 앞, 행사장", "person": "PM, 마감조", "situation": "관객이 빠져나가는 현장, 조명이 꺼짐, 시설 운영 종료, 직원들이 바로 철수 모드로 전환한다.", "point": "관객이 빠져나가는 장면에서 직원이 움직이기 시작하는 순간으로 전환한다.", "question": null, "answer": null}, {"place": "행사장", "person": "PM, 마감조", "situation": "운영존를 하나씩 철거한다. 며칠 동안 만들었던 공간이 사라진다.", "point": "철거 작업보다 사라지는 공간을 바라보는 사람의 반응을 담는다.", "question": "며칠동안 러셔/관객들의 웃음으로 가득찬 공감이 다 철수 되었는데, 가장 먼저 든 생각은 뭐였어요?", "answer": "시원섭섭해요. 아까까지 사람들이 춤추던 공간인데 구조물이 사라지니까 꿈을 꾼 것 같기도 하고, 우리가 제대로 만들어냈구나 싶어서 자랑스럽습니다."}, {"place": "행사장 전역", "person": "러셔", "situation": "제품 회수, 젖은 물품·쓰레기 정리, 시설물 분해, 팔레트·샤워장 철거, 트럭 상차, 마지막으로 힘을 모으는 장면.", "point": "1일차와 대칭되는 구도(트럭 하역 ↔ 트럭 상차)로 촬영한다.", "question": null, "answer": null}, {"place": "빈 행사장", "person": "PM", "situation": "마지막 시설물이 빠져나간 순간, 빈 현장을 바라보는 모습.", "point": null, "question": "어떤 기억이 가장 오래 남을 것 같으세요?", "answer": "아무것도 없던 맨땅에 우리가 공간을 세웠고, 그 안에서 수천 명의 사람들이 행복해했던 그 열기요. 비어 있는 현장이지만 제 눈에는 그 풍경이 계속 선하게 보입니다."}, {"place": "빈 행사장", "person": "PM", "situation": "철수가 끝난 행사장을 바라본다.", "point": null, "question": "같이 완주해 준 팀원들과 스스로에게 지금 꼭 해주고 싶은 한 마디?", "answer": "우리가 진짜 펜타포트의 보이지 않는 주인공이었다! 다들 너무 자랑스럽고 고맙다'는 말을 꼭 안아주면서 해주고 싶습니다."}]}], "broll": {"➊ 고객이 불편하지 않도록 보이지 않는 기반을 만드는 사람들": ["해 뜨는 타임랩스", "텅 빈 행사장", "출입 게이트", "크레인/중장비가 화장실 설치하는 모습", "출근 준비", "커피 마시는 모습", "무전기 전원 켜기", "제품 셋팅", "각 팀 이동", "물류창고", "휴게실", "긴장한 러셔 표정", "해 지는 타입랩스"], "➋ 계획과 실제 현장의 차이를 조율하는 과정": ["회의 준비", "노트북 켜기", "일정표 확인", "무전 시작", "무전하는 모습", "뛰어가는 사람", "PM이 다른 팀을 찾아가는 모습", "무전으로 호출", "제품 전달", "체크리스트 함께 확인", "일정 조율", "문제 해결", "서로 고개 끄덕임", "손가락으로 위치 설명", "모여서 회의", "행사장 맵 보며 설명", "노트북 화면 공유", "종이에 적은 메모", "명찰", "출입증", "무전기", "행사 팔찌", "노트북", "휴대폰", "행사 지도", "타임테이블 인쇄지(PM)"], "➌ 공식적인 업무와 자발적인 헌신이 섞이는 순간": ["존짱 무전기", "러쉬 화장실 쓰레기통이 가득 찬 모습", "러셔 라운지 식재료", "러셔 라운지 얼음 버킷", "러셔 라운지 전경", "철수 시 손을 보태는 모습", "화이트 보드"], "➍ 힘든 노동 속에서도 즐길 수 있는 환경을 서로에게 만들어주는 모습": ["밴드 리허설", "관객 입장 준비", "관객 입장", "공연하는 밴드 모습", "운영존에서 즐기는 직원들", "바람에 흔들리는 깃발", "공연장 조명", "락페 티셔츠, 단체 티셔츠…", "러셔 라운지 돌아가는 모습", "준비 된 얼음물 마시는 모습"], "➎ 모든 것이 사라진 빈 현장에서 느끼는 완주의 감정": ["철수 장면 타입랩스", "크레인/중장비가 화장실 철수하는 모습"]}, "contacts": [{"name": "유주", "role": "PM · 기획 총괄", "desc": "운영/기획 전반 책임자, 현장 판단 최종 결정권자", "phone": "010-4102-4309"}, {"name": "위그", "role": "PM · 운영 기획", "desc": "운영 전반 담당, 현장 이슈에 가장 먼저 대응", "phone": "010-9313-3590"}, {"name": "페퍼", "role": "PM · 콘텐츠 기획", "desc": "마케팅/콘텐츠/이벤트 담당, 챗인·챗아웃 담당", "phone": "010-4132-2535"}], "crew": [{"emoji": "🐣", "name": "프리", "color": "gold", "desc": "보이지 않는 기반 & 완주의 감정 — 디자인팀·본사 인원, 이른 아침 셋팅 및 철수 담당", "assign": "운영진 / 러셔 취재"}, {"emoji": "💥", "name": "블래스트", "color": "tape", "desc": "공식 업무와 자발적 헌신 & 즐김 — 마감조, 물류 상하차, 현장 분위기 메이커", "assign": "존짱 / 러셔 취재"}, {"emoji": "🌊", "name": "더티", "color": "signal", "desc": "공식 업무와 자발적 헌신 & 즐김 — 오픈조, 라운지 운영, 눕존·휴게공간 셋팅", "assign": "러셔 / B-roll 취재"}, {"emoji": "🐰", "name": "호피", "color": "violet", "desc": "계획과 현장의 차이를 조율하는 과정 — PM, CD, 위그 등 현장 총괄 및 의사결정", "assign": "운영진 취재"}], "phase": [{"date": "7/30", "weekday": "목", "phase": "셋팅일", "cut": "➊", "desc": "셋팅 (도면과 실제 현장의 대조, 상차와 하역)", "crew": "🐰💥🌊🐣"}, {"date": "7/31", "weekday": "금", "phase": "행사 1일차", "cut": "➋", "desc": "펜타포트 첫 날 (거듭 변경되는 운영 가이드, 실전 대응, 키라라 공연을 즐기는 러셔들)", "crew": "🐰💥🌊🐣"}, {"date": "8/1", "weekday": "토", "phase": "행사 2일차", "cut": "➌", "desc": "펜타포트 절정의 날 (물집과 파스 / 자발적 헌신)", "crew": "🐰💥🌊🐣"}, {"date": "8/2", "weekday": "일", "phase": "행사 3일차", "cut": "➍", "desc": "펜타포트 마지막 날 (\"오늘만 하면 끝\", 고객과 함께 춤추는 순간)", "crew": "🐰💥🌊🐣"}, {"date": "8/3", "weekday": "월", "phase": "철수일", "cut": "➎", "desc": "빈 현장에서 느끼는 완주의 감정 (1일차 상차와 대칭되는 철수 하역)", "crew": "🌊🐣"}], "packing": {"bring": ["모자", "선글라스", "선크림", "편한 신발", "명찰", "세면도구", "옷", "속옷", "양말", "잠옷", "충전기", "슬리퍼(선택)", "수건", "드라이기", "손풍기", "그 외 기능성 제품"], "given": ["러쉬 로고 티셔츠", "모기 기피제", "반다나", "랜야드", "포카리", "팔토시", "열 패치", "작업 조끼", "텀블러(얼음 물)", "우비"]}};
+</script>
+<script>
+/* ==========================================================================
+   TRV × PENTAPORT — Field Cue Sheet  |  app logic (vanilla JS, no deps)
+   ========================================================================== */
+(function(){
+  "use strict";
+
+  var DATA = window.__APP_DATA__;
+  var DAY_ORDER = DATA.phase.map(function(p){ return p.date; });
+
+  var state = {
+    tab: 'schedule',           // schedule | reference | contacts
+    day: DAY_ORDER[0],
+    myCrew: '',                 // '' = 전체, or one of 🐣💥🌊🐰
+    openCue: {},                // key: day+idx -> bool
+    openBoundary: {}            // key: idx -> bool
+  };
+
+  var ICONS = {
+    phone: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+    chev: '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+    warn: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    calendar: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+    book: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+    contacts: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'
+  };
+
+  var CREW_COLOR = { '🐣':'var(--gold)', '💥':'var(--tape)', '🌊':'var(--signal)', '🐰':'var(--violet)' };
+
+  function esc(s){
+    if(s===null||s===undefined) return '';
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function nl2br(s){ return esc(s); } // white-space:pre-line handles newlines already
+
+  function crewChips(crewStr){
+    if(!crewStr) return '';
+    var found = [];
+    Object.keys(CREW_COLOR).forEach(function(e){
+      if(crewStr.indexOf(e) !== -1) found.push(e);
+    });
+    if(found.length === 0){
+      return '<span class="crew-chip">' + esc(crewStr) + '</span>';
+    }
+    return '<span class="crew-chip">' + found.map(function(e){
+      return '<span class="crew-dot" style="background:'+CREW_COLOR[e]+'"></span>' + e;
+    }).join(' ') + '</span>';
+  }
+
+  function findPhase(day){
+    for(var i=0;i<DATA.phase.length;i++){ if(DATA.phase[i].date===day) return DATA.phase[i]; }
+    return null;
+  }
+
+  /* ---------------------------- render: header ---------------------------- */
+  function renderTopbar(){
+    var ph = findPhase(state.day);
+    var titleHtml, descHtml;
+    if(state.tab === 'schedule' && ph){
+      titleHtml = esc(ph.date) + '(' + esc(ph.weekday) + ') · ' + esc(ph.phase);
+      descHtml = '<span class="cut-tag">'+esc(ph.cut)+'</span>' + esc(ph.desc);
+    } else if(state.tab === 'reference'){
+      titleHtml = '참고자료';
+      descHtml = '바운더리별 촬영 포인트 · 인터뷰 · B-roll · 준비물';
+    } else {
+      titleHtml = '연락처';
+      descHtml = 'PM 비상연락망 · TRV 촬영팀 코드네임';
+    }
+
+    var dayPills = DATA.phase.map(function(p){
+      var active = (state.tab==='schedule' && p.date===state.day) ? ' active' : '';
+      return '<div class="day-pill'+active+'" data-day="'+esc(p.date)+'">' +
+        '<span class="d-date">'+esc(p.date)+'('+esc(p.weekday)+')</span>' +
+        '<span class="d-phase">'+esc(p.phase)+'</span>' +
+      '</div>';
+    }).join('');
+
+    var crewChipsHtml = '<div class="crew-filter-chip'+(state.myCrew===''?' active':'')+'"'+
+      (state.myCrew===''?' style="background:var(--tape)"':'')+' data-my-crew="">전체</div>' +
+      DATA.crew.map(function(c){
+        var active = state.myCrew === c.emoji;
+        var style = active ? ' style="background:'+CREW_COLOR[c.emoji]+'"' : '';
+        return '<div class="crew-filter-chip'+(active?' active':'')+'"'+style+' data-my-crew="'+c.emoji+'">' +
+          '<span class="crew-dot" style="background:'+(active?'var(--ink)':CREW_COLOR[c.emoji])+'"></span>' + c.emoji + ' ' + esc(c.name) +
+        '</div>';
+      }).join('');
+
+    return '' +
+    '<div class="topbar-row">' +
+      '<div class="brand"><span class="rec-dot"></span><span class="brand-text">TRV FIELD SHEET</span></div>' +
+      '<a class="call-btn" href="tel:'+DATA.contacts[0].phone.replace(/-/g,'')+'">'+ICONS.phone+' PM 긴급콜</a>' +
+    '</div>' +
+    '<div class="title-row">' +
+      '<h1>'+titleHtml+'</h1>' +
+      '<p class="phase-desc">'+descHtml+'</p>' +
+    '</div>' +
+    (state.tab==='schedule' ? (
+      '<div class="day-scroll">'+dayPills+'</div>' +
+      '<div class="crew-filter-row"><span class="crew-filter-label">내 동선</span><div class="crew-filter-chips">'+crewChipsHtml+'</div></div>'
+    ) : '');
+  }
+
+  /* ---------------------------- render: schedule ---------------------------- */
+  function renderCueCard(entry, key){
+    var open = !!state.openCue[key];
+    var hasBody = entry.situation || entry.point || entry.question || entry.interviewee || entry.risk;
+    var body = '';
+    if(entry.situation){
+      body += '<div class="cue-row"><span class="k">현장 상황</span><span class="v">'+nl2br(entry.situation)+'</span></div>';
+    }
+    if(entry.point){
+      body += '<div class="cue-row point"><span class="k">촬영 포인트</span><span class="v">'+nl2br(entry.point)+'</span></div>';
+    }
+    if(entry.question || entry.interviewee){
+      body += '<div class="qa-block">';
+      if(entry.question) body += '<div class="qa-q"><span class="tag">Q</span>'+nl2br(entry.question)+'</div>';
+      if(entry.interviewee) body += '<div class="qa-a"><span class="tag">WHO</span>'+nl2br(entry.interviewee)+'</div>';
+      body += '</div>';
+    }
+    if(entry.risk){
+      body += '<div class="risk-chip">'+ICONS.warn+'<span>'+nl2br(entry.risk)+'</span></div>';
+    }
+
+    return '' +
+    '<div class="cue-card'+(open?' open':'')+'" data-cue="'+key+'">' +
+      '<div class="cue-head" data-toggle-cue="'+key+'">' +
+        '<span class="cue-time">'+esc(entry.time)+'</span>' +
+        '<div class="cue-main">' +
+          '<div class="cue-title">'+esc(entry.title || '—')+'</div>' +
+          (entry.crew ? '<div class="cue-crew">'+crewChips(entry.crew)+'</div>' : '') +
+        '</div>' +
+        (hasBody ? ICONS.chev : '') +
+      '</div>' +
+      (hasBody ? '<div class="cue-body">'+body+'</div>' : '') +
+    '</div>';
+  }
+
+  function renderSchedule(){
+    var dayData = DATA.timeline[state.day];
+    if(!dayData || !dayData.entries.length){
+      return '<div class="empty-note">이 날짜의 큐시트가 없습니다.</div>';
+    }
+    var mine = state.myCrew;
+    var html = '<div class="cue-list">';
+    var shown = 0;
+    dayData.entries.forEach(function(entry, i){
+      // keep entries with no crew tag (shared/all-team beats) visible in every filter
+      if(mine && entry.crew && entry.crew.indexOf(mine) === -1) return;
+      html += renderCueCard(entry, state.day+'_'+i);
+      shown++;
+    });
+    html += '</div>';
+    if(shown === 0){
+      var name = '';
+      DATA.crew.forEach(function(c){ if(c.emoji===mine) name = c.name; });
+      return '<div class="empty-note">이 날짜엔 '+esc(mine)+' '+esc(name)+'님 동선이 없습니다.</div>';
+    }
+    return html;
+  }
+
+  /* ---------------------------- render: reference ---------------------------- */
+  function renderCut(cut){
+    var meta = '<span class="place">'+esc(cut.place||'')+'</span>' + (cut.person ? '<span class="who">'+esc(cut.person)+'</span>' : '');
+    var html = '<div class="cut-item">';
+    html += '<div class="cut-meta">'+meta+'</div>';
+    if(cut.situation) html += '<div class="cut-situation">'+nl2br(cut.situation)+'</div>';
+    if(cut.point) html += '<div class="cut-point"><span class="k">POINT</span>'+nl2br(cut.point)+'</div>';
+    if(cut.question || cut.answer){
+      html += '<div class="qa-block">';
+      if(cut.question) html += '<div class="qa-q"><span class="tag">Q</span>'+nl2br(cut.question)+'</div>';
+      if(cut.answer) html += '<div class="qa-a"><span class="tag">A</span>'+nl2br(cut.answer)+'</div>';
+      html += '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function parseHeader(header){
+    // e.g. "담당자 : 프리 ➊ 고객이 불편하지 않도록 보이지 않는 기반을 만드는 사람들"
+    var m = header.match(/담당자\s*:\s*([^\s➊➋➌➍➎]+)\s*([➊➋➌➍➎])\s*(.*)/);
+    if(m) return { owner: m[1], num: m[2], headline: m[3] };
+    return { owner:'', num:'', headline: header };
+  }
+
+  var BROLL_KEYS = Object.keys(DATA.broll);
+
+  function renderBoundaries(){
+    var html = '<div class="section-label">바운더리 · 촬영 & 인터뷰</div>';
+    DATA.boundaries.forEach(function(b, idx){
+      var h = parseHeader(b.header);
+      var open = !!state.openBoundary[idx];
+      var cuts = b.cuts.map(renderCut).join('');
+      var brollKey = BROLL_KEYS[idx];
+      var brollItems = (DATA.broll[brollKey]||[]);
+      var brollHtml = brollItems.length ? (
+        '<div class="broll-wrap"><div class="cut-point"><span class="k">B-ROLL</span></div>' +
+        '<div class="broll-chips">' + brollItems.map(function(x){ return '<span class="broll-chip">'+esc(x)+'</span>'; }).join('') + '</div></div>'
+      ) : '';
+      html += '' +
+      '<div class="boundary-card'+(open?' open':'')+'">' +
+        '<div class="boundary-head" data-toggle-boundary="'+idx+'">' +
+          '<div class="boundary-num">'+esc(h.num)+'</div>' +
+          '<div class="boundary-title">' +
+            '<div class="owner">담당 · '+esc(h.owner)+'</div>' +
+            '<div class="headline">'+esc(h.headline)+'</div>' +
+          '</div>' +
+          ICONS.chev +
+        '</div>' +
+        '<div class="boundary-body">' + cuts + brollHtml + '</div>' +
+      '</div>';
+    });
+    return html;
+  }
+
+  function renderPacking(){
+    var bring = DATA.packing.bring.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('');
+    var given = DATA.packing.given.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('');
+    return '' +
+    '<div class="section-label">준비물 체크</div>' +
+    '<div class="pack-grid">' +
+      '<div><div class="pack-col-title">가져오세요</div><ul class="pack-list bring">'+bring+'</ul></div>' +
+      '<div><div class="pack-col-title">현장에서 드립니다</div><ul class="pack-list given">'+given+'</ul></div>' +
+    '</div>';
+  }
+
+  function renderReference(){
+    return renderBoundaries() + renderPacking();
+  }
+
+  /* ---------------------------- render: contacts ---------------------------- */
+  function renderContacts(){
+    var html = '<div class="section-label">PM 비상연락망</div>';
+    DATA.contacts.forEach(function(c){
+      html += '' +
+      '<div class="pm-card">' +
+        '<div class="pm-info">' +
+          '<div class="pm-name">'+esc(c.name)+'</div>' +
+          '<div class="pm-role">'+esc(c.role)+'</div>' +
+          '<div class="pm-desc">'+esc(c.desc)+'</div>' +
+        '</div>' +
+        '<a class="pm-call" href="tel:'+c.phone.replace(/-/g,'')+'">'+ICONS.phone+'</a>' +
+      '</div>';
+    });
+    html += '<div class="section-label">TRV 촬영팀 코드네임</div>';
+    DATA.crew.forEach(function(c){
+      html += '' +
+      '<div class="crew-legend-card">' +
+        '<div class="crew-legend-emoji">'+c.emoji+'</div>' +
+        '<div>' +
+          '<div class="crew-legend-name"><span class="crew-dot" style="background:'+CREW_COLOR[c.emoji]+'"></span>'+esc(c.name)+'</div>' +
+          '<div class="crew-legend-desc">'+esc(c.desc)+'</div>' +
+          '<div class="crew-legend-assign">'+esc(c.assign)+'</div>' +
+        '</div>' +
+      '</div>';
+    });
+    return html;
+  }
+
+  /* ---------------------------- bottom nav ---------------------------- */
+  function renderNav(){
+    function btn(tab, icon, label){
+      return '<button class="nav-btn'+(state.tab===tab?' active':'')+'" data-tab="'+tab+'">'+icon+'<span>'+label+'</span></button>';
+    }
+    return btn('schedule', ICONS.calendar, '일정') + btn('reference', ICONS.book, '참고자료') + btn('contacts', ICONS.contacts, '연락처');
+  }
+
+  /* ---------------------------- master render ---------------------------- */
+  function render(){
+    var topbar = document.getElementById('topbar');
+    var view = document.getElementById('view');
+    var nav = document.getElementById('nav');
+    topbar.innerHTML = renderTopbar();
+    if(state.tab === 'schedule') view.innerHTML = renderSchedule();
+    else if(state.tab === 'reference') view.innerHTML = renderReference();
+    else view.innerHTML = renderContacts();
+    nav.innerHTML = renderNav();
+    view.scrollTop = 0;
+  }
+
+  /* ---------------------------- events ---------------------------- */
+  document.addEventListener('click', function(e){
+    var t = e.target;
+
+    var navBtn = t.closest('[data-tab]');
+    if(navBtn){ state.tab = navBtn.getAttribute('data-tab'); render(); return; }
+
+    var dayPill = t.closest('[data-day]');
+    if(dayPill){ state.day = dayPill.getAttribute('data-day'); render(); return; }
+
+    var crewPill = t.closest('[data-my-crew]');
+    if(crewPill){ state.myCrew = crewPill.getAttribute('data-my-crew'); render(); return; }
+
+    var cueToggle = t.closest('[data-toggle-cue]');
+    if(cueToggle){
+      var k = cueToggle.getAttribute('data-toggle-cue');
+      state.openCue[k] = !state.openCue[k];
+      render();
+      return;
+    }
+
+    var bToggle = t.closest('[data-toggle-boundary]');
+    if(bToggle){
+      var bi = bToggle.getAttribute('data-toggle-boundary');
+      state.openBoundary[bi] = !state.openBoundary[bi];
+      render();
+      return;
+    }
+  });
+
+  render();
+})();
+
+</script>
+</body>
+</html>
 <!doctype html>
 <html lang="ko">
 <head>
